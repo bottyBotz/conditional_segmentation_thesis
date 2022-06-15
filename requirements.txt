@@ -1,0 +1,8 @@
+nibabel
+numpy
+scipy
+matplotlib
+seaborn
+pandas
+opencv-python #https://stackoverflow.com/questions/51853018/how-do-i-install-opencv-using-pip
+torch
