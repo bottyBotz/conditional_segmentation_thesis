@@ -167,28 +167,28 @@ for pid in os.listdir(os.path.join(src_root, 'fixed_images')):
 
 
         #  -----------UNCOMMENT THESE CODE FOR VISULIAZATION ---------------
-        # save_img(mv_img, get_path(sub, 'mv_img').replace('.npy', '.nii.gz'), pixdim=[2.0, 2.0, 2.0])
-        # save_img(fx_img, get_path(sub, 'fx_img').replace('.npy', '.nii.gz'), pixdim=[2.0, 2.0, 2.0])
+        save_img(mv_img, get_path(sub, 'mv_img').replace('.npy', '.nii.gz'), pixdim=[2.0, 2.0, 2.0])
+        save_img(fx_img, get_path(sub, 'fx_img').replace('.npy', '.nii.gz'), pixdim=[2.0, 2.0, 2.0])
 
-        # save_img(mv_seg[0], get_path(sub, 'mv_seg').replace('.npy', '_0.nii.gz'), pixdim=[2.0, 2.0, 2.0])
-        # save_img(mv_seg[1], get_path(sub, 'mv_seg').replace('.npy', '_1.nii.gz'), pixdim=[2.0, 2.0, 2.0])
-        # save_img(fx_seg[0], get_path(sub, 'fx_seg').replace('.npy', '_0.nii.gz'), pixdim=[2.0, 2.0, 2.0])
-        # save_img(fx_seg[1], get_path(sub, 'fx_seg').replace('.npy', '_1.nii.gz'), pixdim=[2.0, 2.0, 2.0])
+        save_img(mv_seg[0], get_path(sub, 'mv_seg').replace('.npy', '_0.nii.gz'), pixdim=[2.0, 2.0, 2.0])
+        save_img(mv_seg[1], get_path(sub, 'mv_seg').replace('.npy', '_1.nii.gz'), pixdim=[2.0, 2.0, 2.0])
+        save_img(fx_seg[0], get_path(sub, 'fx_seg').replace('.npy', '_0.nii.gz'), pixdim=[2.0, 2.0, 2.0])
+        save_img(fx_seg[1], get_path(sub, 'fx_seg').replace('.npy', '_1.nii.gz'), pixdim=[2.0, 2.0, 2.0])
 
-        # fix2d = plot_pat(fx_img, return_img=True)
-        # fxseg2d_0 = plot_pat(fx_seg[0], return_img=True)
-        # fxseg2d_1 = plot_pat(fx_seg[1], return_img=True)
-        # fix2d = add_contours(fix2d, fxseg2d_0, color=(255, 0, 0))
-        # fix2d = add_contours(fix2d, fxseg2d_1, color=(255, 255, 0))
+        fix2d = plot_pat(fx_img, return_img=True)
+        fxseg2d_0 = plot_pat(fx_seg[0], return_img=True)
+        fxseg2d_1 = plot_pat(fx_seg[1], return_img=True)
+        fix2d = add_contours(fix2d, fxseg2d_0, color=(255, 0, 0))
+        fix2d = add_contours(fix2d, fxseg2d_1, color=(255, 255, 0))
         
-        # mv2d = plot_pat(mv_img, return_img=True)
-        # mvseg2d_0 = plot_pat(mv_seg[0], return_img=True)
-        # mvseg2d_1 = plot_pat(mv_seg[1], return_img=True)
-        # mv2d = add_contours(mv2d, mvseg2d_0, color=(255, 0, 0))
-        # mv2d = add_contours(mv2d, mvseg2d_1, color=(255, 255, 0))
+        mv2d = plot_pat(mv_img, return_img=True)
+        mvseg2d_0 = plot_pat(mv_seg[0], return_img=True)
+        mvseg2d_1 = plot_pat(mv_seg[1], return_img=True)
+        mv2d = add_contours(mv2d, mvseg2d_0, color=(255, 0, 0))
+        mv2d = add_contours(mv2d, mvseg2d_1, color=(255, 255, 0))
 
-        # plt.imsave(get_path(sub, 'fx_seg').replace('.npy', '.png'), fix2d, cmap='gray')
-        # plt.imsave(get_path(sub, 'mv_seg').replace('.npy', '.png'), mv2d, cmap='gray')
+        plt.imsave(get_path(sub, 'fx_seg').replace('.npy', '.png'), fix2d, cmap='gray')
+        plt.imsave(get_path(sub, 'mv_seg').replace('.npy', '.png'), mv2d, cmap='gray')
         #  -----------UNCOMMENT THESE CODE FOR VISULIAZATION ---------------
         
 
