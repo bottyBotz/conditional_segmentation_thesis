@@ -64,8 +64,8 @@ def save_img(tensor_arr, save_path, pixdim=[1.0, 1.0, 1.0]):
     
     
 
-save_root = '/media/yipeng/data/data/CBCT/fullResCropIntensityClip_resampled_example'
-src_root = '/media/yipeng/data/data/CBCT/fullResCropIntensityClip'
+save_root = '/home/bot/thesis/Data/others/deepRegData/fullResCropIntensityClip_resampled'
+src_root = '/home/bot/thesis/Data/others/deepRegData/fullResCropIntensityClip'
 
 for k in ['moving_images', 'moving_labels', 'fixed_images', 'fixed_labels']:
     os.makedirs(os.path.join(save_root, k), exist_ok=True)
