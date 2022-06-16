@@ -104,8 +104,8 @@ class cbctSeg(BaseArch):
                 pred_seg = self.net(input_tensor)
 
                 global_loss = self.loss(pred_seg, gt_seg)
-                global_loss.backward()
-                optimizer.step()
+                global_loss.backward() #backward pass
+                optimizer.step() #Gradient Descent
 
             if self.epoch % self.config.save_frequency == 0:
                 self.save()
