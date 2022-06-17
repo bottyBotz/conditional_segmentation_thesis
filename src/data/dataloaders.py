@@ -30,7 +30,7 @@ class CBCTData(data.Dataset):
         else:
             fx_img_path, mv_img_path, fx_seg_path, mv_seg_path = self.data_pairs[index]
 
-        moving_image, moving_label = np.load(mv_img_path, allow_pickle=True), np.load(mv_seg_path, allow_pickle=True)
+        moving_image, moving_label = np.load(mv_img_path), np.load(mv_seg_path)
         fixed_image, fixed_label = np.load(fx_img_path), np.load(fx_seg_path)
 
         if self.phase in ['train'] and self.config.two_stage_sampling:
