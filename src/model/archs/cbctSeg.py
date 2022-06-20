@@ -45,8 +45,8 @@ class cbctSeg(BaseArch):
         print('>>> Holdout set ready.')
 
     def get_input(self, input_dict, aug=True):
-        fx_img, mv_img = input_dict['fx_img'].cuda(), input_dict['mv_img'].cuda()  # [batch, 1, x, y, z]
-        fx_seg, mv_seg = input_dict['fx_seg'].cuda(), input_dict['mv_seg'].cuda()
+        fx_img, mv_img = input_dict['fx_img'].cuda(), input_dict['mv_img'].cuda()  # [batch, 1, x, y, z], image
+        fx_seg, mv_seg = input_dict['fx_seg'].cuda(), input_dict['mv_seg'].cuda()  # label
         fx_seg, mv_seg = fx_seg[:, 0, ...], mv_seg[:, 0, ...]
 
         if (self.config.affine_scale != 0.0) and aug:
@@ -174,15 +174,17 @@ class cbctSeg(BaseArch):
         results = {
             'dice': [],
             }
-
+        #Iterate through test data loader
         for idx, input_dict in enumerate(self.test_loader):
-            input_tensor, gt_seg = self.get_input(input_dict, aug=False)
-            pred_seg = self.net(input_tensor)
+            input_tensor, gt_seg = self.get_input(input_dict, aug=False) #Get input and label
+            pred_seg = self.net(input_tensor) #predict the segmentation label
 
             # self.save_img(fx_img, os.path.join(visualization_path, f'{idx+1}-fx_img.nii'))
             # self.save_img(mv_img, os.path.join(visualization_path, f'{idx+1}-mv_img.nii'))
             
             subject = input_dict['subject']
+
+
             for label_idx in range(gt_seg.shape[1]):
                 aft_dice = loss.binary_dice(pred_seg[:, label_idx, ...], gt_seg[:, label_idx, ...]).cpu().numpy()
 
