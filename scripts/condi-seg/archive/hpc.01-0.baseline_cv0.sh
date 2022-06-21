@@ -10,7 +10,7 @@ date
 python3 -u train.py \
 --project ConditionalSeg \
 --exp_name hpc.01-0.CondisegCBCT_cv0_nc16 \
---data_path ../data/CBCT/fullResCropIntensityClip_resampled \
+--data_path ../data/CBCT/fullResCropIntensityClip_resampled_overfit \
 --batch_size 8 \
 --cv 0 \
 --input_shape 64 101 91 \
@@ -21,5 +21,4 @@ python3 -u train.py \
 --w_dce 1.0 \
 --using_HPC 1 \
 --nc_initial 16
-                   
                    
