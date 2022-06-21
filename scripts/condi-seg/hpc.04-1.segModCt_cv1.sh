@@ -10,7 +10,7 @@ date
 python3 -u train.py \
 --project CBCTUnetSeg \
 --exp_name hpc.04-1.segModeCTCV1 \
---data_path /home/bot/thesis/Data/others/deepRegData/fullResCropIntensityClip_resampled_overfit \
+--data_path /home/bot/thesis/Data/others/deepRegData/fullResCropIntensityClip_resampled \
 --batch_size 8 \
 --input_mode ct \
 --inc 1 \
@@ -19,7 +19,7 @@ python3 -u train.py \
 --input_shape 64 101 91 \
 --lr 1e-5 \
 --affine_scale 0.15 \
---save_frequency 100 \
+--save_frequency 10 \
 --num_epochs 25 \
 --w_dce 1.0 \
 --using_HPC 1 \
