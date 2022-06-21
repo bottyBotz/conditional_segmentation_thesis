@@ -6,10 +6,13 @@ from src.data import dataloaders
 import torch, os
 import torch.optim as optim
 from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
 import pickle as pkl
 import numpy as np
 from scipy import stats
 import random
+
+
 
 
 class cbctSeg(BaseArch):
@@ -19,6 +22,8 @@ class cbctSeg(BaseArch):
         self.net = self.net_parsing()
         self.set_dataloader()
         self.best_metric = 0
+        self.writer = SummaryWriter(os.path.join(os.getcwd(), 'tensorboard_logs'))
+        print(f"Writing Tensorboard to {os.path.join(os.getcwd(), 'tensorboard_logs')}")
 
     def net_parsing(self):
         model = self.config.model
@@ -99,6 +104,10 @@ class cbctSeg(BaseArch):
             print('-' * 10, f'Train epoch_{self.epoch}', '-' * 10)
             for self.step, input_dict in enumerate(self.train_loader):
                 input_tensor, gt_seg = self.get_input(input_dict)
+                
+                #if self.epoch == 1:
+                #    self.writer.add_graph(self.net, input_tensor) 
+
                 optimizer.zero_grad()
 
                 pred_seg = self.net(input_tensor)
@@ -106,13 +115,23 @@ class cbctSeg(BaseArch):
                 global_loss = self.loss(pred_seg, gt_seg)
                 global_loss.backward() #backward pass
                 optimizer.step() #Gradient Descent
+            
+            self.writer.add_scalar("cbctseg/Loss/train/", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
 
+            #Save the model at periodic frequencies
             if self.epoch % self.config.save_frequency == 0:
                 self.save()
+                
             print('-' * 10, 'validation', '-' * 10)
+
+            self.writer.add_graph(self.net, input_tensor) 
+
             self.validation()
         
         self.inference()
+
+        self.writer.flush() #Flush Tensorboard
+        
 
     def loss(self, pred_seg, gt_seg):
         L_All = 0
@@ -146,23 +165,31 @@ class cbctSeg(BaseArch):
         os.makedirs(visualization_path, exist_ok=True)
 
         res = []
+        #Iterate through validation dataloader
         for idx, input_dict in enumerate(self.val_loader):
-            input_tensor, gt_seg = self.get_input(input_dict, aug=False)
-            pred_seg = self.net(input_tensor)
+            input_tensor, gt_seg = self.get_input(input_dict, aug=False) #No augmentation for validation
+            pred_seg = self.net(input_tensor) #Get Predicted Segmentation from trained model
             subject = input_dict['subject']
 
+            #Iterate through the labels to calculate binary_dice metric
             for label_idx in range(pred_seg.shape[1]):
                 binary_dice = loss.binary_dice(pred_seg[:, label_idx, ...], gt_seg[:, label_idx, ...])
                 print(f'subject:{subject}', f'label_idx:{label_idx}', f'DICE:{binary_dice:.3f}')
                 res.append(binary_dice)
 
-        res = torch.tensor(res)
-        mean, std = torch.mean(res), torch.std(res)
+        res = torch.tensor(res) #Get average binary_dice across all subjects in validation set
+        mean, std = torch.mean(res), torch.std(res) #Aggregate binary_dice across all subjects in validation set
+        self.writer.add_scalar("cbctseg/Dice_Mean/validation/", mean, self.epoch) #Write Dice for Epoch to Tensorboard
+        self.writer.add_scalar("cbctseg/Dice_Std/validation/", std, self.epoch) #Write Dice for Epoch to Tensorboard
+        
+        #Save the best model as it's performance on the validation set
         if mean > self.best_metric:
             self.best_metric = mean
             print('better model found.')
             self.save(type='best')
         print('Dice:', mean, std)
+        self.writer.flush() #Flush Tensorboard
+        self.writer.close() #Close Tensorboard
 
 
     @torch.no_grad()
@@ -207,3 +234,5 @@ class cbctSeg(BaseArch):
 
         with open(os.path.join(self.log_dir, 'results.pkl'), 'wb') as f:
             pkl.dump(results, f)
+
+
