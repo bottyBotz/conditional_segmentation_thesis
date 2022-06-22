@@ -724,3 +724,4 @@ data/fullResCropIntensityClip/moving_labels/p058.nii.gz
 data/fullResCropIntensityClip/moving_labels/p059.nii.gz
 data/fullResCropIntensityClip/moving_labels/p060.nii.gz
 data/fullResCropIntensityClip/moving_labels/p061.nii.gz
+env/*
