@@ -104,9 +104,6 @@ class cbctSeg(BaseArch):
             print('-' * 10, f'Train epoch_{self.epoch}', '-' * 10)
             for self.step, input_dict in enumerate(self.train_loader):
                 input_tensor, gt_seg = self.get_input(input_dict)
-                
-                #if self.epoch == 1:
-                #    self.writer.add_graph(self.net, input_tensor) 
 
                 optimizer.zero_grad()
 
@@ -116,7 +113,7 @@ class cbctSeg(BaseArch):
                 global_loss.backward() #backward pass
                 optimizer.step() #Gradient Descent
             
-            self.writer.add_scalar(f"cbctseg/Loss/train/cv/{self.config.cv}", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
+            self.writer.add_scalar(f"cbctseg/Loss/train/{self.config.exp_name}", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
             #Save the model at periodic frequencies
             if self.epoch % self.config.save_frequency == 0:
                 self.save()
@@ -126,10 +123,10 @@ class cbctSeg(BaseArch):
             self.validation()
         
         self.writer.add_graph(self.net, input_tensor) #Save Network Graph to Tensorboard
-
+        self.writer.flush() #Flush Tensorboard
         self.inference()
 
-        self.writer.flush() #Flush Tensorboard
+        
         
 
     def loss(self, pred_seg, gt_seg):
@@ -178,8 +175,8 @@ class cbctSeg(BaseArch):
 
         res = torch.tensor(res) #Get average binary_dice across all subjects in validation set
         mean, std = torch.mean(res), torch.std(res) #Aggregate binary_dice across all subjects in validation set
-        self.writer.add_scalar(f"cbctseg/Dice_Mean/validation/cv/{self.config.cv}", mean, self.epoch) #Write Dice for Epoch to Tensorboard
-        self.writer.add_scalar(f"cbctseg/Dice_Std/validation/cv/{self.config.cv}", std, self.epoch) #Write Dice for Epoch to Tensorboard
+        self.writer.add_scalar(f"cbctseg/Dice_Mean/validation/{self.config.exp_name}", mean, self.epoch) #Write Dice for Epoch to Tensorboard
+        self.writer.add_scalar(f"cbctseg/Dice_Std/validation/{self.config.exp_name}", std, self.epoch) #Write Dice for Epoch to Tensorboard
         
         #Save the best model as it's performance on the validation set
         if mean > self.best_metric:
