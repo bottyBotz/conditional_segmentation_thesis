@@ -11,6 +11,7 @@ parser.add_argument('--outc', default=2, type=int, help='output channel number (
 # Training options
 parser.add_argument('--model', default='UNet', type=str, help='LocalAffine/LocalEncoder/LocalModel/...')
 parser.add_argument('--cv', default=0, type=int, help='The fold for cross validation')
+parser.add_argument('--continue_epoch', default=-1, type=int, help='Selst to -1 to disallow training from most recent epoch. Set to epoch # to continue training.')
 
 # sampling options
 parser.add_argument('--input_mode', default='both', type=str, help='ct/cbct/oneof/both')

@@ -5,6 +5,7 @@ from src.model.archs.baseArch import BaseArch
 from src.data import dataloaders
 import torch, os
 import torch.optim as optim
+from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 import pickle as pkl
 import numpy as np
@@ -19,6 +20,8 @@ class condiSeg(BaseArch):
         self.net = self.net_parsing()
         self.set_dataloader()
         self.best_metric = 0
+        self.writer = SummaryWriter(os.path.join(os.getcwd(), 'tensorboard_logs'))
+        print(f"Writing Tensorboard to {os.path.join(os.getcwd(), 'tensorboard_logs')}")
 
     def net_parsing(self):
         model = self.config.model
@@ -109,6 +112,9 @@ class condiSeg(BaseArch):
                 pred_seg = self.net(torch.cat([fx_img, mv_img, mv_seg], dim=1))
 
                 global_loss = self.loss(pred_seg, fx_seg)
+
+
+
                 global_loss.backward()
                 optimizer.step()
 
@@ -127,11 +133,15 @@ class condiSeg(BaseArch):
                     global_loss.backward()
                     optimizer.step()
 
+            self.writer.add_scalar(f"condiseg/Loss/train/{self.config.exp_name}", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
+            #Save the model at periodic frequencies
             if self.epoch % self.config.save_frequency == 0:
                 self.save()
             print('-' * 10, 'validation', '-' * 10)
             self.validation()
-        
+
+        self.writer.add_graph(self.net, torch.cat([fx_img, mv_img, mv_seg], dim=1)) #Save Network Graph to Tensorboard
+
         self.inference()
 
     def loss(self, pred_seg, fx_seg):
