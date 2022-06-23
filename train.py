@@ -27,7 +27,7 @@ if __name__ == "__main__":
     # elif args.model == "joint3":
     #     model = archs.joint3(args)
 
-    seed_all(s) #Set random seeds for reproducibility
+    seed_all(42) #Set random seeds for reproducibility
 
     if config.project == 'Longitudinal':
         from src.model.archs.longitudinal import LongiReg
