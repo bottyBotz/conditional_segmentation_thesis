@@ -1,6 +1,18 @@
 import os
 from config.global_train_config import config
 import torch
+import numpy as np
+
+## For reproducible results    
+def seed_all(s):
+    random.seed(s)
+    np.random.seed(s)
+    os.environ['PYTHONHASHSEED'] = str(s) 
+    torch.manual_seed(s)
+    print('Seeds set!')
+    
+random_state = 42
+seed_all(random_state)
 
 if not config.using_HPC:
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -14,6 +26,8 @@ if __name__ == "__main__":
     #     model = weakSuperVisionMpMRIReg(args)
     # elif args.model == "joint3":
     #     model = archs.joint3(args)
+
+    seed_all(s) #Set random seeds for reproducibility
 
     if config.project == 'Longitudinal':
         from src.model.archs.longitudinal import LongiReg
