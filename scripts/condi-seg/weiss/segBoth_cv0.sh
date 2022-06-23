@@ -21,11 +21,10 @@ python3 -u train.py \
 --lr 1e-5 \
 --affine_scale 0.15 \
 --save_frequency 100 \
---num_epochs 1000 \
+--num_epochs 3000 \
 --w_dce 1.0 \
 --using_HPC 0 \
 --nc_initial 16 \
 --two_stage_sampling 0 \
---continue_epoch 1000
                    
                    
