@@ -39,4 +39,8 @@ if __name__ == "__main__":
         model.load_epoch(config.continue_epoch)
 
     model.train()
+
+    #Tensorboard
+    model.writer.flush() #Write to Disk
+    model.writer.close() #Close
     print('Optimization done.')
