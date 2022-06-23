@@ -138,7 +138,8 @@ class condiSeg(BaseArch):
             if self.epoch % self.config.save_frequency == 0:
                 self.save()
             print('-' * 10, 'validation', '-' * 10)
-            self.validation()
+            
+            self.validation() #Run the validation step
 
         self.writer.add_graph(self.net, torch.cat([fx_img, mv_img, mv_seg], dim=1)) #Save Network Graph to Tensorboard
 
@@ -192,6 +193,11 @@ class condiSeg(BaseArch):
 
         res = torch.tensor(res)
         mean, std = torch.mean(res), torch.std(res)
+
+        self.writer.add_scalar(f"cbctseg/Dice_Mean/validation/{self.config.exp_name}", mean, self.epoch) #Write Dice for Epoch to Tensorboard
+        self.writer.add_scalar(f"cbctseg/Dice_Std/validation/{self.config.exp_name}", std, self.epoch) #Write Dice for Epoch to Tensorboard
+
+        #Save the best model as it's performance on the validation set
         if mean > self.best_metric:
             self.best_metric = mean
             print('better model found.')
