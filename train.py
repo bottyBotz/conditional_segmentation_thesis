@@ -5,7 +5,6 @@ import numpy as np
 
 ## For reproducible results    
 def seed_all(s):
-    random.seed(s)
     np.random.seed(s)
     os.environ['PYTHONHASHSEED'] = str(s) 
     torch.manual_seed(s)
