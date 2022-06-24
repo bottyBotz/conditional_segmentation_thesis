@@ -133,16 +133,18 @@ class condiSeg(BaseArch):
                     global_loss.backward()
                     optimizer.step()
 
-            self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Loss/train", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
+            self.writer.add_scalar(f"cbctseg/Loss/train/{self.config.exp_name}", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
             #Save the model at periodic frequencies
             if self.epoch % self.config.save_frequency == 0:
                 self.save()
-            print('-' * 10, 'validation', '-' * 10)
+            print('-' * 10, 'validation', '-' * 10) 
             
-            self.validation() #Run the validation step
+            #Run the validation step
+            self.validation() 
 
         self.writer.add_graph(self.net, torch.cat([fx_img, mv_img, mv_seg], dim=1)) #Save Network Graph to Tensorboard
 
+        #Run Holdout Test Set for this fold.
         self.inference()
 
     def loss(self, pred_seg, fx_seg):
@@ -194,8 +196,8 @@ class condiSeg(BaseArch):
         res = torch.tensor(res)
         mean, std = torch.mean(res), torch.std(res)
 
-        self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Mean/validation", mean, self.epoch) #Write Dice for Epoch to Tensorboard
-        self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Std/validation", std, self.epoch) #Write Dice for Epoch to Tensorboard
+        self.writer.add_scalar(f"cbctseg/{self.config.exp_name}/Dice_Mean/validation", mean, self.epoch) #Write Dice Mean for Epoch to Tensorboard
+        self.writer.add_scalar(f"cbctseg/{self.config.exp_name}/Dice_Std/validation", std, self.epoch) #Write Dice Std for Epoch to Tensorboard
 
         #Save the best model as it's performance on the validation set
         if mean > self.best_metric:
@@ -215,6 +217,7 @@ class condiSeg(BaseArch):
             'dice-wo-reg': [],
             }
 
+        #Iterate through the test data loader
         for idx, input_dict in enumerate(self.test_loader):
             fx_img, fx_seg, mv_img, mv_seg = self.get_input(input_dict, aug=False)
             self.save_img(fx_img, os.path.join(visualization_path, f'{idx+1}-fx_img.nii'))
@@ -222,7 +225,7 @@ class condiSeg(BaseArch):
 
             label_num = fx_seg.shape[2]
             for label_idx in range(fx_seg.shape[2]):
-                pred_seg = self.net(torch.cat([fx_img, mv_img, mv_seg[:, :, label_idx, ...]], dim=1))
+                pred_seg = self.net(torch.cat([fx_img, mv_img, mv_seg[:, :, label_idx, ...]], dim=1)) #Forward Pass
 
                 aft_dice = loss.binary_dice(pred_seg, fx_seg[:, :, label_idx, ...]).cpu().numpy()
                 bef_dice = loss.binary_dice(fx_seg[:, :, label_idx, ...], mv_seg[:, :, label_idx, ...]).cpu().numpy()
@@ -230,6 +233,9 @@ class condiSeg(BaseArch):
                 subject = input_dict['subject']
                 results['dice'].append(aft_dice)
                 results['dice-wo-reg'].append(bef_dice)
+                self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice/inference/subject_{subject}/label_idx_{label_idx}", results['dice'][-1], self.epoch) #Write Dice for subject and organ to Tensorboard
+                self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/dice-wo-reg/inference/subject_{subject}/label_idx_{label_idx}", results['dice-wo-reg'][-1], self.epoch) #Write Dice for subject and organ to Tensorboard
+
                 print(f'subject:{subject}', f'label_idx:{label_idx}', f'BEF-DICE:{bef_dice:.3f}', f'AFT-DICE:{aft_dice:.3f}')
 
                 self.save_img(fx_seg[:, :, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-fx_img_{label_idx}.nii'))
