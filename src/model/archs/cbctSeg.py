@@ -120,10 +120,13 @@ class cbctSeg(BaseArch):
                 
             print('-' * 10, 'validation', '-' * 10)
 
+            #Run validation step
             self.validation()
         
         self.writer.add_graph(self.net, input_tensor) #Save Network Graph to Tensorboard
         self.writer.flush() #Flush Tensorboard
+
+        #Run holdout test set
         self.inference()
 
         
