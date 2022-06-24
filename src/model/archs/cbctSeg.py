@@ -174,13 +174,13 @@ class cbctSeg(BaseArch):
             for label_idx in range(pred_seg.shape[1]):
                 binary_dice = loss.binary_dice(pred_seg[:, label_idx, ...], gt_seg[:, label_idx, ...])
                 print(f'subject:{subject}', f'label_idx:{label_idx}', f'DICE:{binary_dice:.3f}')
-                self.writer.add_scalar(f"cbctseg/{self.config.exp_name}/binary_dice/validation/subject_{subject}/label_idx_{label_idx}", binary_dice, self.epoch)
+                self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/binary_dice/validation/subject_{subject}/label_idx_{label_idx}", binary_dice, self.epoch)
                 res.append(binary_dice)
 
         res = torch.tensor(res) #Get average binary_dice across all subjects in validation set
         mean, std = torch.mean(res), torch.std(res) #Aggregate binary_dice across all subjects in validation set
-        self.writer.add_scalar(f"cbctseg/{self.config.exp_name}/Dice_Mean/validation", mean, self.epoch) #Write Dice for Epoch to Tensorboard
-        self.writer.add_scalar(f"cbctseg/{self.config.exp_name}/Dice_Std/validation", std, self.epoch) #Write Dice for Epoch to Tensorboard
+        self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Mean/validation", mean, self.epoch) #Write Dice for Epoch to Tensorboard
+        self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Std/validation", std, self.epoch) #Write Dice for Epoch to Tensorboard
         
         #Save the best model as it's performance on the validation set
         if mean > self.best_metric:
@@ -189,7 +189,6 @@ class cbctSeg(BaseArch):
             self.save(type='best')
         print('Dice:', mean, std)
         self.writer.flush() #Flush Tensorboard
-        self.writer.close() #Close Tensorboard
 
 
     @torch.no_grad()
@@ -222,7 +221,7 @@ class cbctSeg(BaseArch):
                     f'AFT-DICE:{aft_dice:.3f}'
                     )
                 
-                self.writer.add_scalar(f"cbctseg/{self.config.exp_name}/aft_dice/inference/subject_{subject}/label_idx_{label_idx}", aft_dice, self.epoch) #Write Dice for Epoch to Tensorboard
+                self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice/inference/subject_{subject}/label_idx_{label_idx}", aft_dice, self.epoch) #Write Dice for Epoch to Tensorboard
 
                 # self.save_img(fx_seg[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-fx_img_{label_idx}.nii'))
                 # self.save_img(mv_seg[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-mv_img_{label_idx}.nii'))
@@ -234,8 +233,8 @@ class cbctSeg(BaseArch):
             mean, std = np.mean(v), np.std(v)
             print(k, f'{mean:.3f}, {std:.3f}')
 
-        self.writer.add_scalar(f"cbctseg/{self.config.exp_name}/aft_dice_mean/inference", mean, self.epoch) #Write Dice for Epoch to Tensorboard
-        self.writer.add_scalar(f"cbctseg/{self.config.exp_name}/aft_dice_std/inference", std, self.epoch) #Write Dice for Epoch to Tensorboard
+        self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice_mean/inference", mean, self.epoch) #Write Dice for Epoch to Tensorboard
+        self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice_std/inference", std, self.epoch) #Write Dice for Epoch to Tensorboard
 
         with open(os.path.join(self.log_dir, 'results.pkl'), 'wb') as f:
             pkl.dump(results, f)

@@ -133,7 +133,7 @@ class condiSeg(BaseArch):
                     global_loss.backward()
                     optimizer.step()
 
-            self.writer.add_scalar(f"{self.project}/{self.config.exp_name}/Loss/train", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
+            self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Loss/train", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
             #Save the model at periodic frequencies
             if self.epoch % self.config.save_frequency == 0:
                 self.save()
@@ -194,8 +194,8 @@ class condiSeg(BaseArch):
         res = torch.tensor(res)
         mean, std = torch.mean(res), torch.std(res)
 
-        self.writer.add_scalar(f"{self.project}/{self.config.exp_name}/Dice_Mean/validation", mean, self.epoch) #Write Dice for Epoch to Tensorboard
-        self.writer.add_scalar(f"{self.project}/{self.config.exp_name}/Dice_Std/validation", std, self.epoch) #Write Dice for Epoch to Tensorboard
+        self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Mean/validation", mean, self.epoch) #Write Dice for Epoch to Tensorboard
+        self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Std/validation", std, self.epoch) #Write Dice for Epoch to Tensorboard
 
         #Save the best model as it's performance on the validation set
         if mean > self.best_metric:
