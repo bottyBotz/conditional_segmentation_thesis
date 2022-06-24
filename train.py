@@ -9,9 +9,6 @@ def seed_all(s):
     os.environ['PYTHONHASHSEED'] = str(s) 
     torch.manual_seed(s)
     print(f'Seeds set to {s}!')
-    
-random_state = 42
-seed_all(random_state)
 
 if not config.using_HPC:
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
