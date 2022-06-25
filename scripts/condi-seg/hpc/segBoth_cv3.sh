@@ -10,7 +10,7 @@ date
 python3 -u train.py \
 --project CBCTUnetSeg \
 --exp_name segModeBothCV3 \
---data_path ../../../raid/candi/daniel/Data/others/deepRegData/fullResCropIntensityClip_resampled \
+--data_path ../../../Data/fullResCropIntensityClip_resampled \
 --batch_size 16 \
 --input_mode both \
 --inc 2 \
