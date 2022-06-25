@@ -3,7 +3,7 @@
 #$ -l gpu=true
 #$ -l h_rt=96:0:0
 #$ -j y
-#$ -N segMCTCV0
+#$ -N segBothCV7
 #$ -cwd
 hostname
 date

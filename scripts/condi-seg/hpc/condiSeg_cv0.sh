@@ -1,16 +1,16 @@
 #$ -S /bin/bash
 #$ -l tmem=11G
 #$ -l gpu=true
-#$ -l h_rt=300:0:0
+#$ -l h_rt=100:0:0
 #$ -j y
-#$ -N CS_cv1_nc16
+#$ -N CS_cv0_nc16
 #$ -cwd
 hostname
 date
 python3 -u train.py \
 --project ConditionalSeg \
 --exp_name CondisegCBCT_cv0_nc16 \
---data_path ../../../raid/candi/daniel/Data/others/deepRegData/fullResCropIntensityClip_resampled \
+--data_path ./Data/fullResCropIntensityClip_resampled \
 --batch_size 16 \
 --cv 0 \
 --input_shape 64 101 91 \
