@@ -1,9 +1,9 @@
 #$ -S /bin/bash
 #$ -l tmem=11G
 #$ -l gpu=true
-#$ -l h_rt=96:0:0
+#$ -l h_rt=100:0:0
 #$ -j y
-#$ -N segMCTCV0
+#$ -N segBothCV1
 #$ -cwd
 hostname
 date
