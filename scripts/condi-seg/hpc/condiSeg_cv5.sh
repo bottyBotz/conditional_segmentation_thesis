@@ -10,7 +10,7 @@ date
 python3 -u train.py \
 --project ConditionalSeg \
 --exp_name CondisegCBCT_cv5_nc16 \
---data_path ../../../Data/fullResCropIntensityClip_resampled \
+--data_path ./Data/fullResCropIntensityClip_resampled \
 --batch_size 16 \
 --cv 5 \
 --input_shape 64 101 91 \
