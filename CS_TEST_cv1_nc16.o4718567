@@ -1,8 +1,0 @@
-GPU Prolog Script v1.10
-This is a GPU node.
-Enough GPUs available.
-Allocating card 0
-gonzo-605-9.local
-Sat 25 Jun 13:46:06 BST 2022
-/opt/gridengine/default/spool/gonzo-605-9/job_scripts/4718567: line 10: python3: command not found
-GPU Epilog Script v0.30
