@@ -183,8 +183,8 @@ class condiSeg(BaseArch):
             for label_idx in range(fx_seg.shape[2]):
                 pred_seg = self.net(torch.cat([fx_img, mv_img, mv_seg[:, :, label_idx, ...]], dim=1))
                 binary_dice = loss.binary_dice(pred_seg, fx_seg[:, :, label_idx, ...])
-                self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/binary_dice/validation/subject_{subject}/label_idx_{label_idx}", binary_dice, self.epoch)
                 subject = input_dict['subject']
+                self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/binary_dice/validation/subject_{subject}/label_idx_{label_idx}", binary_dice, self.epoch)
 
                 print(f'subject:{subject}', f'label_idx:{label_idx}', f'DICE:{binary_dice:.3f}')
                 res.append(binary_dice)
