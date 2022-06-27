@@ -1,4 +1,4 @@
-import os
+import os, time
 from config.global_train_config import config
 import torch
 import numpy as np
@@ -48,7 +48,9 @@ if __name__ == "__main__":
     if config.continue_epoch != '-1':
         model.load_epoch(config.continue_epoch)
 
+    startTime = time.time()
     model.train()
+    print(f'Training {config.project} model took {time.time() - startTime} seconds')
 
     #Tensorboard
     model.writer.flush() #Write to Disk
