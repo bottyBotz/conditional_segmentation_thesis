@@ -11,7 +11,7 @@ python3 -u train.py \
 --project CBCTUnetSeg \
 --exp_name segModeBothCV0 \
 --data_path ./Data/fullResCropIntensityClip_resampled \
---batch_size 16 \
+--batch_size 8 \
 --input_mode both \
 --inc 2 \
 --outc 2 \
