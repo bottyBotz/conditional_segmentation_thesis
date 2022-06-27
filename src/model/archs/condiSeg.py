@@ -133,7 +133,7 @@ class condiSeg(BaseArch):
                     global_loss.backward()
                     optimizer.step()
 
-            self.writer.add_scalar(f"{self.config.project}/Loss/train/{self.config.exp_name}", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
+            self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Loss/train", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
             #Save the model at periodic frequencies
             if self.epoch % self.config.save_frequency == 0:
                 self.save()
@@ -233,8 +233,8 @@ class condiSeg(BaseArch):
                 subject = input_dict['subject']
                 results['dice'].append(aft_dice)
                 results['dice-wo-reg'].append(bef_dice)
-                self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice/inference/subject_{subject}/label_idx_{label_idx}", results['dice'][-1], self.epoch) #Write Dice for subject and organ to Tensorboard
-                self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/dice-wo-reg/inference/subject_{subject}/label_idx_{label_idx}", results['dice-wo-reg'][-1], self.epoch) #Write Dice for subject and organ to Tensorboard
+                #self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice/inference/subject_{subject}/label_idx_{label_idx}", results['dice'][-1], self.epoch) #Write Dice for subject and organ to Tensorboard
+                #self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/dice-wo-reg/inference/subject_{subject}/label_idx_{label_idx}", results['dice-wo-reg'][-1], self.epoch) #Write Dice for subject and organ to Tensorboard
 
                 print(f'subject:{subject}', f'label_idx:{label_idx}', f'BEF-DICE:{bef_dice:.3f}', f'AFT-DICE:{aft_dice:.3f}')
 

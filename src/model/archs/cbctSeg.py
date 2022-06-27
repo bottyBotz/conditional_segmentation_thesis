@@ -113,7 +113,7 @@ class cbctSeg(BaseArch):
                 global_loss.backward() #backward pass
                 optimizer.step() #Gradient Descent
             
-            self.writer.add_scalar(f"cbctseg/Loss/train/{self.config.exp_name}", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
+            self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Loss/train", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
             #Save the model at periodic frequencies
             if self.epoch % self.config.save_frequency == 0:
                 self.save()
@@ -124,7 +124,6 @@ class cbctSeg(BaseArch):
             self.validation()
         
         self.writer.add_graph(self.net, input_tensor) #Save Network Graph to Tensorboard
-        self.writer.flush() #Flush Tensorboard
 
         #Run holdout test set
         self.inference()
@@ -221,7 +220,7 @@ class cbctSeg(BaseArch):
                     f'AFT-DICE:{aft_dice:.3f}'
                     )
                 
-                self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice/inference/subject_{subject}/label_idx_{label_idx}", aft_dice, self.epoch) #Write Dice for Epoch to Tensorboard
+                #self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice/inference/subject_{subject}/label_idx_{label_idx}", aft_dice, self.epoch) #Write Dice for Epoch to Tensorboard
 
                 # self.save_img(fx_seg[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-fx_img_{label_idx}.nii'))
                 # self.save_img(mv_seg[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-mv_img_{label_idx}.nii'))
