@@ -7,6 +7,8 @@
 #$ -cwd
 hostname
 date
+source /share/apps/source_files/python/python-3.9.5.source
+source /share/apps/source_files/cuda/cuda-11.0.source
 python3 -u train.py \
 --project ConditionalSeg \
 --exp_name CondisegCBCT_cv2_nc16 \
