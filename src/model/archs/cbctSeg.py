@@ -187,7 +187,6 @@ class cbctSeg(BaseArch):
             print('better model found.')
             self.save(type='best')
         print('Dice:', mean, std)
-        self.writer.flush() #Flush Tensorboard
 
 
     @torch.no_grad()
@@ -232,8 +231,8 @@ class cbctSeg(BaseArch):
             mean, std = np.mean(v), np.std(v)
             print(k, f'{mean:.3f}, {std:.3f}')
 
-        self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice_mean/inference", mean, self.epoch) #Write Dice for Epoch to Tensorboard
-        self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice_std/inference", std, self.epoch) #Write Dice for Epoch to Tensorboard
+        #self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice_mean/inference", mean, self.epoch) #Write Dice for Epoch to Tensorboard
+        #self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice_std/inference", std, self.epoch) #Write Dice for Epoch to Tensorboard
 
         with open(os.path.join(self.log_dir, 'results.pkl'), 'wb') as f:
             pkl.dump(results, f)
