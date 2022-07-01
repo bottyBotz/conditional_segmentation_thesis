@@ -13,7 +13,7 @@ from scipy import stats
 
 class weakSup(BaseArch):
     def __init__(self, config):
-        super(weakSup, self).__init__(config)
+        super(weakSup, self).__init__(config) #https://www.pythonforbeginners.com/super/working-python-super-function
         self.config = config
         self.net = LocalModel(self.config).cuda()
         self.set_dataloader()

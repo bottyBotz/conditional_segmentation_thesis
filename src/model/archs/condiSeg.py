@@ -15,7 +15,7 @@ import cv2, random
 
 class condiSeg(BaseArch):
     def __init__(self, config):
-        super(condiSeg, self).__init__(config)
+        super(condiSeg, self).__init__(config) #https://www.pythonforbeginners.com/super/working-python-super-function
         self.config = config
         self.net = self.net_parsing()
         self.set_dataloader()

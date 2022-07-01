@@ -17,7 +17,7 @@ import random
 
 class cbctSeg(BaseArch):
     def __init__(self, config):
-        super(cbctSeg, self).__init__(config)
+        super(cbctSeg, self).__init__(config) #https://www.pythonforbeginners.com/super/working-python-super-function
         self.config = config
         self.net = self.net_parsing()
         self.set_dataloader()
