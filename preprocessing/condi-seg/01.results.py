@@ -69,7 +69,7 @@ def get_numbers_v2(data):
     {mean(rectum_dice_atf):.3f} +- {std(rectum_dice_atf):.3f}'  
 
 exp_dir_list = [
-    './logs/ConditionalSeg/CondisegCBCT_-*',
+    './logs/ConditionalSeg/CondisegCBCT*',
     './logs/CBCTUnetSeg/segModeBoth*',
     './logs/CBCTUnetSeg/segModeCT*',
     './logs/CBCTUnetSeg/segModeCBCT*'
