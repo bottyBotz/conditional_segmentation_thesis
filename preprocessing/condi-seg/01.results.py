@@ -69,10 +69,10 @@ def get_numbers_v2(data):
     {mean(rectum_dice_atf):.3f} +- {std(rectum_dice_atf):.3f}'  
 
 exp_dir_list = [
-    './logs/ConditionalSeg/CondisegCBCT*',
-    './logs/CBCTUnetSeg/segModeBoth*',
-    './logs/CBCTUnetSeg/segModeCT*',
-    './logs/CBCTUnetSeg/segModeCBCT*'
+    './logs/ConditionalSeg/CondisegCBCT*/',
+    '../../logs/CBCTUnetSeg/segModeBoth*/',
+    './logs/CBCTUnetSeg/segModeCT*/',
+    './logs/CBCTUnetSeg/segModeCBCT*/'
     #'./logs/CBCTUnetSeg/hpc.09-*',
 ]
 
@@ -83,7 +83,7 @@ entire_results = {
     'method':[]
 }
 
-
+#Loop through the experiment directory list
 for exp_d in exp_dir_list:
     exp_resfiles = glob(os.path.join(exp_d, 'results.pkl'))
     exp_resfiles.sort()
