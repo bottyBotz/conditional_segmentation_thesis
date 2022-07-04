@@ -101,46 +101,50 @@ class condiSeg(BaseArch):
     def train(self):
         self.save_configure()
         optimizer = optim.Adam(self.net.parameters(), lr=self.config.lr, weight_decay=1e-6)
-        for self.epoch in range(1, self.config.num_epochs + 1):
-            self.net.train()
+        log_dir = f"./logs/{self.config.project}"
+        log_save_path = os.path.join(log_dir, 'running_logs')
+        os.makedirs(log_save_path, exist_ok=True)
+        with open(os.path.join(log_save_path, f'{self.config.exp_name}_train_log_{self.config.cv}.txt'), 'w') as f:
+            f.write(f"project,exp_name,fold,train_val_test,epoch,value,value_type\n")
+            for self.epoch in range(1, self.config.num_epochs + 1):
+                self.net.train()
 
-            print('-' * 10, f'Train epoch_{self.epoch}', '-' * 10)
-            for self.step, input_dict in enumerate(self.train_loader):
-                fx_img, fx_seg, mv_img, mv_seg = self.get_input(input_dict)
+                print('-' * 10, f'Train epoch_{self.epoch}', '-' * 10)
+                for self.step, input_dict in enumerate(self.train_loader):
+                    fx_img, fx_seg, mv_img, mv_seg = self.get_input(input_dict)
 
-                optimizer.zero_grad()
-                pred_seg = self.net(torch.cat([fx_img, mv_img, mv_seg], dim=1))
-
-                global_loss = self.loss(pred_seg, fx_seg)
-
-
-
-                global_loss.backward()
-                optimizer.step()
-
-                if self.config.use_pseudo_label:
-                    print("in pseudo training....")
-                    # generate pseudo data
-                    pseudo_input = self.gen_pseudo_data()
-                    pseudo_out = self.forward_pseudo_data([fx_img, mv_img, pseudo_input])
-                    pseudo_label = pseudo_out.detach()
-
-                    # use pseudo data to train another round
-                    self.net.train()
                     optimizer.zero_grad()
-                    pred_seg = self.net(torch.cat([fx_img, mv_img, pseudo_input], dim=1))
-                    global_loss = self.loss(pred_seg, pseudo_label)
+                    pred_seg = self.net(torch.cat([fx_img, mv_img, mv_seg], dim=1))
+
+                    global_loss = self.loss(pred_seg, fx_seg)
+
                     global_loss.backward()
                     optimizer.step()
 
-            self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Loss/train", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
-            #Save the model at periodic frequencies
-            if self.epoch % self.config.save_frequency == 0:
-                self.save()
-            print('-' * 10, 'validation', '-' * 10) 
-            
-            #Run the validation step
-            self.validation() 
+                    if self.config.use_pseudo_label:
+                        print("in pseudo training....")
+                        # generate pseudo data
+                        pseudo_input = self.gen_pseudo_data()
+                        pseudo_out = self.forward_pseudo_data([fx_img, mv_img, pseudo_input])
+                        pseudo_label = pseudo_out.detach()
+
+                        # use pseudo data to train another round
+                        self.net.train()
+                        optimizer.zero_grad()
+                        pred_seg = self.net(torch.cat([fx_img, mv_img, pseudo_input], dim=1))
+                        global_loss = self.loss(pred_seg, pseudo_label)
+                        global_loss.backward()
+                        optimizer.step()
+
+                self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Loss/train", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
+                f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'train',{self.epoch},{global_loss},'loss'\n")
+                #Save the model at periodic frequencies
+                if self.epoch % self.config.save_frequency == 0:
+                    self.save()
+                print('-' * 10, 'validation', '-' * 10) 
+                
+                #Run the validation step
+                self.validation(f) 
 
         self.writer.add_graph(self.net, torch.cat([fx_img, mv_img, mv_seg], dim=1)) #Save Network Graph to Tensorboard
 
@@ -167,7 +171,7 @@ class condiSeg(BaseArch):
         return L_All
 
     @torch.no_grad()
-    def validation(self):
+    def validation(self, f = None):
         self.net.eval()
         # visualization_path = os.path.join(self.log_dir, f'{self.config.exp_name}-vis-in-val')
         # os.makedirs(visualization_path, exist_ok=True)
@@ -198,6 +202,8 @@ class condiSeg(BaseArch):
 
         self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Mean/validation", mean, self.epoch) #Write Dice Mean for Epoch to Tensorboard
         self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Std/validation", std, self.epoch) #Write Dice Std for Epoch to Tensorboard
+        f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'val',{self.epoch},{mean},'dice_mean'\n")
+        f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'val',{self.epoch},{std},'dice_std'\n")
 
         #Save the best model as it's performance on the validation set
         if mean > self.best_metric:

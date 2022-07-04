@@ -99,29 +99,36 @@ class cbctSeg(BaseArch):
     def train(self):
         self.save_configure()
         optimizer = optim.Adam(self.net.parameters(), lr=self.config.lr, weight_decay=1e-6)
-        for self.epoch in range(1, self.config.num_epochs + 1):
-            self.train_mode()
-            print('-' * 10, f'Train epoch_{self.epoch}', '-' * 10)
-            for self.step, input_dict in enumerate(self.train_loader):
-                input_tensor, gt_seg = self.get_input(input_dict)
+        log_dir = f"./logs/{self.config.project}"
+        log_save_path = os.path.join(log_dir, 'running_logs')
+        os.makedirs(log_save_path, exist_ok=True)     
+        with open(os.path.join(log_save_path, f'{self.config.exp_name}_train_log_{self.config.cv}.txt'), 'w') as f:
+            f.write(f"project,exp_name,fold,train_val_test,epoch,value,value_type\n")
+            for self.epoch in range(1, self.config.num_epochs + 1):
+                self.train_mode()
+                print('-' * 10, f'Train epoch_{self.epoch}', '-' * 10)
+                for self.step, input_dict in enumerate(self.train_loader):
+                    input_tensor, gt_seg = self.get_input(input_dict)
 
-                optimizer.zero_grad()
+                    optimizer.zero_grad()
 
-                pred_seg = self.net(input_tensor)
+                    pred_seg = self.net(input_tensor)
 
-                global_loss = self.loss(pred_seg, gt_seg)
-                global_loss.backward() #backward pass
-                optimizer.step() #Gradient Descent
-            
-            self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Loss/train", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
-            #Save the model at periodic frequencies
-            if self.epoch % self.config.save_frequency == 0:
-                self.save()
+                    global_loss = self.loss(pred_seg, gt_seg)
+                    global_loss.backward() #backward pass
+                    optimizer.step() #Gradient Descent
                 
-            print('-' * 10, 'validation', '-' * 10)
+                self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Loss/train", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
+                f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'train',{self.epoch},{global_loss},'loss'\n")
+                
+                #Save the model at periodic frequencies
+                if self.epoch % self.config.save_frequency == 0:
+                    self.save()
+                    
+                print('-' * 10, 'validation', '-' * 10)
 
-            #Run validation step
-            self.validation()
+                #Run validation step
+                self.validation(f)
         
         self.writer.add_graph(self.net, input_tensor) #Save Network Graph to Tensorboard
 
@@ -157,7 +164,7 @@ class cbctSeg(BaseArch):
         return L_All
 
     @torch.no_grad()
-    def validation(self):
+    def validation(self, f = None):
         self.val_mode()
         visualization_path = os.path.join(self.log_dir, f'{self.config.exp_name}-vis-in-val')
         os.makedirs(visualization_path, exist_ok=True)
@@ -180,7 +187,10 @@ class cbctSeg(BaseArch):
         mean, std = torch.mean(res), torch.std(res) #Aggregate binary_dice across all subjects in validation set
         self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Mean/validation", mean, self.epoch) #Write Dice for Epoch to Tensorboard
         self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Std/validation", std, self.epoch) #Write Dice for Epoch to Tensorboard
-        
+        f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'val',{self.epoch},{mean},'dice_mean'\n")
+        f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'val',{self.epoch},{std},'dice_std'\n")
+       
+
         #Save the best model as it's performance on the validation set
         if mean > self.best_metric:
             self.best_metric = mean
