@@ -2,7 +2,7 @@
 #$ -S /bin/bash
 #$ -l tmem=11G
 #$ -l gpu=true
-#$ -l h_rt=300:0:0
+#$ -l h_rt=75:0:0
 #$ -j y
 #$ -N CS_cv6_nc16
 #$ -cwd
