@@ -1,1 +1,0 @@
-conditional_segmentation_thesis/logs/CBCTUnetSeg/hpc.04-0.segModeCTCV0-20220617-140413/config.pkl

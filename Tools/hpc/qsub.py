@@ -1,12 +1,6 @@
-###
-#
-
-
-
 import os
 import sys
-from glob import glob
-#glob lets you iterate through across all text files in a folder or any file in a folder. Stores them as a list.
+from glob import glob #glob lets you iterate through across all text files in a folder or any file in a folder. Stores them as a list.
 
 pattern = sys.argv[1] #Get the first argument after the filename
 scripts = glob(pattern, recursive=True) #
