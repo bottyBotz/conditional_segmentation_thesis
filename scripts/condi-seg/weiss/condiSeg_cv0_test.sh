@@ -16,9 +16,9 @@ python3 -u train.py \
 --input_shape 64 101 91 \
 --lr 3e-5 \
 --affine_scale 0.15 \
---gpu 2 \
+--gpu 0 \
 --save_frequency 500 \
---num_epochs 10 \
+--num_epochs 100 \
 --w_dce 1.0 \
 --using_HPC 0 \
 --nc_initial 16

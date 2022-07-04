@@ -21,8 +21,8 @@ python3 -u train.py \
 --input_shape 64 101 91 \
 --lr 1e-5 \
 --affine_scale 0.15 \
---save_frequency 100 \
---num_epochs 50000 \
+--save_frequency 1000 \
+--num_epochs 20000 \
 --w_dce 1.0 \
 --using_HPC 1 \
 --nc_initial 16 \
