@@ -111,7 +111,7 @@ class condiSeg(BaseArch):
 
                 print('-' * 10, f'Train epoch_{self.epoch}', '-' * 10)
                 for self.step, input_dict in enumerate(self.train_loader):
-                    fx_img, fx_seg, mv_img, mv_seg = self.get_input(input_dict)
+                    mv_img, mv_seg, fx_img, fx_seg  = self.get_input(input_dict) # Reversed this line for Reversed CondiSeg
 
                     optimizer.zero_grad()
                     pred_seg = self.net(torch.cat([fx_img, mv_img, mv_seg], dim=1))
