@@ -13,7 +13,7 @@ from scipy import stats
 import cv2, random
 
 
-class condiSeg(BaseArch):
+class condiSegReversed(BaseArch):
     def __init__(self, config):
         super(condiSeg, self).__init__(config) #https://www.pythonforbeginners.com/super/working-python-super-function
         self.config = config
