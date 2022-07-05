@@ -33,6 +33,8 @@ if __name__ == "__main__":
     elif config.project == "ConditionalSeg":
         from src.model.archs.condiSeg import condiSeg
         model = condiSeg(config)
+    elif config.project == "ConditionalSegReversed":
+        from src.model.archs.condiSegReversed import condiSeg
     elif config.project == "WeakSup":
         from src.model.archs.weakSup import weakSup
         model = weakSup(config)
