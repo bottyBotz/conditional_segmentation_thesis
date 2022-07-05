@@ -10,7 +10,7 @@ date
 python3 -u train.py \
 --project ConditionalSegReversed \
 --exp_name CondisegCBCT_cv0_nc16 \
---data_path ../../../raid/candi/daniel/Data/others/deepRegData/fullResCropIntensityClip_resampled \
+--data_path ../../../../raid/candi/daniel/Data/others/deepRegData/fullResCropIntensityClip_resampled \
 --batch_size 8 \
 --cv 0 \
 --input_shape 64 101 91 \
