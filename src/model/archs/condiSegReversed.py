@@ -225,7 +225,7 @@ class condiSegReversed(BaseArch):
 
         #Iterate through the test data loader
         for idx, input_dict in enumerate(self.test_loader):
-            mv_img, mv_se, fx_img, fx_seg = self.get_input(input_dict, aug=False) #Reversed this line for Reversed CondiSeg
+            mv_img, mv_seg, fx_img, fx_seg = self.get_input(input_dict, aug=False) #Reversed this line for Reversed CondiSeg
             self.save_img(fx_img, os.path.join(visualization_path, f'{idx+1}-fx_img.nii'))
             self.save_img(mv_img, os.path.join(visualization_path, f'{idx+1}-mv_img.nii'))
 
