@@ -51,22 +51,23 @@ class cbctSeg(BaseArch):
         print('>>> Holdout set ready.')
 
     def get_input(self, input_dict, aug=True):
-        """_summary_
+        """Get input to the CBCT segmentation network
 
         Args:
-            input_dict (_type_): _description_
-            aug (bool, optional): _description_. Defaults to True.
+            input_dict (ndarray): Fixed and Moving image and label tensors
+            aug (bool, optional): Whether to perform data augmentation (generation of perturbed 3D Grid). Defaults to True.
 
         Raises:
-            NotImplementedError: _description_
+            NotImplementedError: If the input mode is not valid (cbct/ct/oneof/both)
 
         Returns:
-            _type_: _description_
+            tensor : Correct type of input tensor combining fixed and moving image and label tensors
         """        
         fx_img, mv_img = input_dict['fx_img'].cuda(), input_dict['mv_img'].cuda()  # [batch, 1, x, y, z], image
         fx_seg, mv_seg = input_dict['fx_seg'].cuda(), input_dict['mv_seg'].cuda()  # label
         fx_seg, mv_seg = fx_seg[:, 0, ...], mv_seg[:, 0, ...]
 
+        #If affine scale set in config, perform affine scaling
         if (self.config.affine_scale != 0.0) and aug:
             mv_affine_grid = smfunctions.rand_affine_grid(
                 mv_img, 
@@ -184,7 +185,7 @@ class cbctSeg(BaseArch):
 
     @torch.no_grad() #No Gradient Computation for validation step
     def validation(self, f = None):
-        self.val_mode() #Set model to validation mode
+        self.val_mode() #Set model to validation/evaluation mode
         visualization_path = os.path.join(self.log_dir, f'{self.config.exp_name}-vis-in-val') #Path to save visualization
         os.makedirs(visualization_path, exist_ok=True) #Create directory if it doesn't exist
 
