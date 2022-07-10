@@ -21,7 +21,7 @@ python3 -u train.py \
 --two_stage_sampling 0 \
 --affine_scale 0.15 \
 --save_frequency 1000 \
---num_epochs 50000 \
+--num_epochs 20000 \
 --w_dce 1.0 \
 --using_HPC 1 \
 --nc_initial 16
