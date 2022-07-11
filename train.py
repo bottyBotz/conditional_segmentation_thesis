@@ -2,10 +2,12 @@ import os, time
 from config.global_train_config import config
 import torch
 import numpy as np
+import random
 
 ## For reproducible results    
 def seed_all(s):
     np.random.seed(s)
+    random.seed(s)
     os.environ['PYTHONHASHSEED'] = str(s) 
     torch.manual_seed(s)
     print(f'Seeds set to {s}!')
