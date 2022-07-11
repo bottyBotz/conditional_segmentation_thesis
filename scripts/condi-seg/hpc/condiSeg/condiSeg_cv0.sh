@@ -15,7 +15,6 @@ python3 -u train.py \
 --data_path ./Data/fullResCropIntensityClip_resampled \
 --batch_size 8 \
 --cv 0 \
---two_stage_sampling 0 \
 --input_shape 64 101 91 \
 --lr 1e-5 \
 --affine_scale 0.15 \

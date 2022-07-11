@@ -16,7 +16,6 @@ python3 -u train.py \
 --batch_size 8 \
 --cv 2 \
 --input_shape 64 101 91 \
---two_stage_sampling 0 \
 --lr 1e-5 \
 --affine_scale 0.15 \
 --save_frequency 1000 \

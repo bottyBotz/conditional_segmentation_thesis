@@ -17,7 +17,6 @@ python3 -u train.py \
 --cv 5 \
 --input_shape 64 101 91 \
 --lr e-5 \
---two_stage_sampling 0 \
 --affine_scale 0.15 \
 --save_frequency 1000 \
 --num_epochs 20000 \
