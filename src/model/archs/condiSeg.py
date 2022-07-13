@@ -48,8 +48,22 @@ class condiSeg(BaseArch):
         print('>>> Holdout set ready.')
 
     def get_input(self, input_dict, aug=True):
+        """Get input to the CBCT segmentation network
+
+        Args:
+            input_dict (ndarray): Fixed and Moving image and label tensors
+            aug (bool, optional): Whether to perform data augmentation (generation of perturbed 3D Grid). Defaults to True.
+
+        Raises:
+            NotImplementedError: If the input mode is not valid (cbct/ct/oneof/both)
+
+        Returns:
+            tensor : Correct type of input tensor combining fixed and moving image and label tensors
+        """      
         fx_img, mv_img = input_dict['fx_img'].cuda(), input_dict['mv_img'].cuda()  # [batch, 1, x, y, z]
-        fx_seg, mv_seg = input_dict['fx_seg'].cuda(), input_dict['mv_seg'].cuda()
+        fx_seg, mv_seg = input_dict['fx_seg'].cuda(), input_dict['mv_seg'].cuda()  # label
+        
+        #If affine scale set in config, perform affine scaling
         if (self.config.affine_scale != 0.0) and aug:
             mv_affine_grid = smfunctions.rand_affine_grid(
                 mv_img, 
@@ -99,6 +113,10 @@ class condiSeg(BaseArch):
         return pseudo_out
 
     def train(self):
+        """
+        Training and validation loop for the model. Writes to tensorboard and logs directory for the current folds training and validation. 
+        Performs inference on the holdout set after training.
+        """        
         self.save_configure()
         optimizer = optim.Adam(self.net.parameters(), lr=self.config.lr, weight_decay=1e-6)
         log_dir = f"./logs/{self.config.project}"
@@ -111,15 +129,15 @@ class condiSeg(BaseArch):
 
                 print('-' * 10, f'Train epoch_{self.epoch}', '-' * 10)
                 for self.step, input_dict in enumerate(self.train_loader):
-                    fx_img, fx_seg, mv_img, mv_seg = self.get_input(input_dict)
+                    fx_img, fx_seg, mv_img, mv_seg = self.get_input(input_dict) 
 
-                    optimizer.zero_grad()
-                    pred_seg = self.net(torch.cat([fx_img, mv_img, mv_seg], dim=1))
+                    optimizer.zero_grad() # clear gradients
+                    pred_seg = self.net(torch.cat([fx_img, mv_img, mv_seg], dim=1)) # forward pass
 
-                    global_loss = self.loss(pred_seg, fx_seg)
+                    global_loss = self.loss(pred_seg, fx_seg) # compute loss
 
-                    global_loss.backward()
-                    optimizer.step()
+                    global_loss.backward() # backward pass
+                    optimizer.step() #Gradient Descent
 
                     if self.config.use_pseudo_label:
                         print("in pseudo training....")
@@ -137,7 +155,8 @@ class condiSeg(BaseArch):
                         optimizer.step()
 
                 self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Loss/train", global_loss, self.epoch) #Write Loss for Epoch to Tensorboard
-                f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'train',{self.epoch},{global_loss},'loss'\n")
+                f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'train',{self.epoch},{global_loss},'loss'\n") # Write Loss for Epoch to Log File
+                
                 #Save the model at periodic frequencies
                 if self.epoch % self.config.save_frequency == 0:
                     self.save()
@@ -155,11 +174,13 @@ class condiSeg(BaseArch):
         L_All = 0
         Info = f'step {self.step}'
         
+        #Weighted DICE
         if self.config.w_dce != 0: 
             L_dice = loss.single_scale_dice(fx_seg, pred_seg) * self.config.w_dce
             L_All += L_dice
             Info += f', Loss_dice: {L_dice:.3f}'
-            
+        
+        #Binary Cross Entropy
         if self.config.w_bce != 0:
             L_BCE = loss.wBCE(pred_seg, fx_seg, weights=self.config.class_weights)
             L_All += L_BCE
@@ -170,13 +191,14 @@ class condiSeg(BaseArch):
         print(Info)
         return L_All
 
-    @torch.no_grad()
+    @torch.no_grad() #No Gradient Computation for validation step
     def validation(self, f = None):
-        self.net.eval()
+        self.net.eval() # Set model to validation/evaluation Mode
         # visualization_path = os.path.join(self.log_dir, f'{self.config.exp_name}-vis-in-val')
         # os.makedirs(visualization_path, exist_ok=True)
 
         res = []
+        #Iterate through the validation dataloader
         for idx, input_dict in enumerate(self.val_loader):
             fx_img, fx_seg, mv_img, mv_seg = self.get_input(input_dict, aug=False)
             # fx Size([1, 1, 2, 152, 269, 121]) mv Size([1, 1, 2, 152, 269, 121])
@@ -202,8 +224,8 @@ class condiSeg(BaseArch):
 
         self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Mean/validation", mean, self.epoch) #Write Dice Mean for Epoch to Tensorboard
         self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/Dice_Std/validation", std, self.epoch) #Write Dice Std for Epoch to Tensorboard
-        f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'val',{self.epoch},{mean},'dice_mean'\n")
-        f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'val',{self.epoch},{std},'dice_std'\n")
+        f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'val',{self.epoch},{mean},'dice_mean'\n") # Write Dice Mean for Epoch to Log File
+        f.write(f"{self.config.project},{self.config.exp_name},{self.config.cv},'val',{self.epoch},{std},'dice_std'\n") # Write Dice Std for Epoch to Log File
 
         #Save the best model as it's performance on the validation set
         if mean > self.best_metric:
@@ -212,9 +234,9 @@ class condiSeg(BaseArch):
             self.save(type='best')
         print('Dice:', mean, std)
 
-    @torch.no_grad()
+    @torch.no_grad() #No Gradient Computation for inference step
     def inference(self):
-        self.net.eval()
+        self.net.eval() #set model to test/eval mode
         visualization_path = os.path.join(self.log_dir, f'{self.config.exp_name}-vis-{self.epoch}')
         os.makedirs(visualization_path, exist_ok=True)
 
