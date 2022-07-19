@@ -25,6 +25,6 @@ python3 -u train.py \
 --w_dce 1.0 \
 --using_HPC 0 \
 --nc_initial 16 \
---two_stage_sampling 0 \
+--two_stage_sampling 1 \
                    
                    

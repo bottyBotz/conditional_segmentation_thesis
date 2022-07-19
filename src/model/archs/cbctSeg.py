@@ -65,7 +65,18 @@ class cbctSeg(BaseArch):
         """        
         fx_img, mv_img = input_dict['fx_img'].cuda(), input_dict['mv_img'].cuda()  # [batch, 1, x, y, z], image
         fx_seg, mv_seg = input_dict['fx_seg'].cuda(), input_dict['mv_seg'].cuda()  # label
-        fx_seg, mv_seg = fx_seg[:, 0, ...], mv_seg[:, 0, ...]
+        # print(f"fx_img.shape: {fx_img.shape}")
+        # print(f"mv_img.shape: {mv_img.shape}")
+        # print(f"fx_seg.shape: {fx_seg.shape}")
+        # print(f"mv_seg.shape: {mv_seg.shape}")
+        #print("Update shapes")
+        #fx_seg, mv_seg = fx_seg[:, 0, ...], mv_seg[:, 0, ...]
+        #print(f"fx_seg.shape: {fx_seg.shape}")
+        #print(f"mv_seg.shape: {mv_seg.shape}")
+        if self.config.two_stage_sampling == 0:
+            fx_seg, mv_seg = fx_seg[:, 0, ...], mv_seg[:, 0, ...] #This removes the label dimension from the segmentation
+        #else:
+        #    pass
 
         #If affine scale set in config, perform affine scaling
         if (self.config.affine_scale != 0.0) and aug:
@@ -79,17 +90,33 @@ class cbctSeg(BaseArch):
                 scale=self.config.affine_scale,
                 random_seed=self.config.affine_seed
                 )
+            #print("fx_affine_grid.shape: ", fx_affine_grid.shape)
+            #print("mv_affine_grid.shape: ", mv_affine_grid.shape)
+            #mv_img = torch.cat((mv_img, mv_affine_grid), dim=1)
+            #fx_img = torch.cat((fx_img, fx_affine_grid), dim=1)
+            #print("fx_img.shape: ", fx_img.shape)
+            #print("mv_img.shape: ", mv_img.shape)
+
             mv_img = torch.nn.functional.grid_sample(mv_img, mv_affine_grid, mode='bilinear', align_corners=True)
             mv_seg = torch.nn.functional.grid_sample(mv_seg, mv_affine_grid, mode='bilinear', align_corners=True)
             fx_img = torch.nn.functional.grid_sample(fx_img, fx_affine_grid, mode='bilinear', align_corners=True)
             fx_seg = torch.nn.functional.grid_sample(fx_seg, fx_affine_grid, mode='bilinear', align_corners=True)
         else:
             pass
+        # print("before further updates")
+        # print(f"fx_img.shape: {fx_img.shape}")
+        # print(f"mv_img.shape: {mv_img.shape}")
+        # print(f"fx_seg.shape: {fx_seg.shape}")
+        # print(f"mv_seg.shape: {mv_seg.shape}")
+        # print(f'torch.cat([fx_img, mv_img], dim=1){torch.cat([fx_img, mv_img], dim=1).shape}')
 
         # ct/cbct/oneof/both
         if self.config.input_mode == 'both':
             assert self.config.inc == 2, "input channel needs to be 2"
-            return torch.cat([fx_img, mv_img], dim=1), fx_seg  # [cbct, ct], cbct_seg
+            if self.config.two_stage_sampling == 1:
+                return torch.cat([fx_img, mv_img], dim = 1), fx_seg.squeeze(0)
+            else:
+                return torch.cat([fx_img, mv_img], dim=1), fx_seg  # [cbct, ct], cbct_seg
         elif self.config.input_mode == 'ct':
             assert self.config.inc == 1, "input channel needs to be 1"
             if self.phase == 'train':
@@ -108,6 +135,7 @@ class cbctSeg(BaseArch):
                 return fx_img, fx_seg
         else:
             raise NotImplementedError
+        
 
 
     def train(self):
