@@ -45,6 +45,17 @@ def center_crop(arr, x, y, z):
     return arr[cx-x:cx+x, cy-y:cy+y, cz-z:cz+z]
 
 def center_crop2(arr, x, y, z):
+    """This function is used to center crop a 3D volume.
+
+    Args:
+        arr (float32): 3D volume of image.
+        x (int): size of the crop in x direction
+        y (int): size of the crop in y direction
+        z (int): size of the crop in z direction
+
+    Returns:
+        arr (float32): Image array after center crop.
+    """
     cx, cy, cz = np.array(arr.shape)//2
     assert x<=cx and y<=cy and z<=cz, "rad exceeded the boundary"
     return arr[x:-x, y:-y, z:-z]
@@ -94,12 +105,12 @@ for pid in os.listdir(os.path.join(src_root, 'fixed_images')):
         sub = CBCTCropped(pid.replace('.nii.gz', ''))
         print(f'------------{pid}------------')
 
-        mv_pixdim, mv_img = sub.get_arr('mv_img')
-        fx_pixdim, fx_img = sub.get_arr('fx_img')
+        mv_pixdim, mv_img = sub.get_arr('mv_img') #Get dimensions of moving image [x, y, z]
+        fx_pixdim, fx_img = sub.get_arr('fx_img') #Get dimensions of fixed image [x, y, z]
         _, mv_seg = sub.get_arr('mv_seg')
         _, fx_seg = sub.get_arr('fx_seg')
         
-        mv_shape = np.array(mv_img.shape)
+        mv_shape = np.array(mv_img.shape) 
         fx_shape = np.array(fx_img.shape)
 
         fx_img = ndimage.zoom(fx_img, fx_pixdim/np.array([2.0 ,2.0, 2.0]), order=2)
