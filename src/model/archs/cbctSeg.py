@@ -261,7 +261,12 @@ class cbctSeg(BaseArch):
             input_tensor, gt_seg = self.get_input(input_dict, aug=False) #Get input and label
             pred_seg = self.net(input_tensor) #predict the segmentation label
 
-            self.save_img(input_tensor, os.path.join(visualization_path, f'{idx+1}-{self.config.input_mode}.nii'))
+            print(f"input_tensor.shape:{input_tensor.shape}")
+            if self.config.input_mode == 'both':
+                for image_idx in range(input_tensor.shape[1]):
+                    self.save_img(input_tensor[:, image_idx, ...], os.path.join(visualization_path, f'{idx+1}-pred_img_{image_idx}.nii'))
+            else:
+                self.save_img(input_tensor, os.path.join(visualization_path, f'{idx+1}-{self.config.input_mode}.nii'))
             #self.save_img(gt_seg, os.path.join(visualization_path, f'{idx+1}-gt_seg.nii'))
             
             subject = input_dict['subject']
