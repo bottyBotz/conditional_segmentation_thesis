@@ -261,8 +261,8 @@ class cbctSeg(BaseArch):
             input_tensor, gt_seg = self.get_input(input_dict, aug=False) #Get input and label
             pred_seg = self.net(input_tensor) #predict the segmentation label
 
-            self.save_img(input_tensor, os.path.join(visualization_path, f'{idx+1}-input_tensor.nii'))
-            self.save_img(gt_seg, os.path.join(visualization_path, f'{idx+1}-gt_seg.nii'))
+            self.save_img(input_tensor, os.path.join(visualization_path, f'{idx+1}-{self.config.input_mode}.nii'))
+            #self.save_img(gt_seg, os.path.join(visualization_path, f'{idx+1}-gt_seg.nii'))
             
             subject = input_dict['subject']
 
@@ -279,9 +279,12 @@ class cbctSeg(BaseArch):
                 
                 #self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice/inference/subject_{subject}/label_idx_{label_idx}", aft_dice, self.epoch) #Write Dice for Epoch to Tensorboard
 
-                self.save_img(input_tensor[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-input_tensor_{label_idx}.nii'))
+                #self.save_img(input_tensor[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-input_tensor_{label_idx}.nii'))
                 self.save_img(gt_seg[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-gt_seg_{label_idx}.nii'))
-                self.save_img(pred_seg[0], os.path.join(visualization_path, f'{idx+1}-pred_img_{label_idx}.nii'))
+                #print(f"gt_seg.shape: {gt_seg.shape}")
+                #print(f"gt_seg[:, label_idx, ...].shape: {gt_seg[:, label_idx, ...].shape}")
+                #print(f"pred_seg.shape: {pred_seg.shape}")
+                self.save_img(pred_seg[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-pred_img_{label_idx}.nii'))
 
             print('-' * 20)
 
