@@ -261,8 +261,8 @@ class cbctSeg(BaseArch):
             input_tensor, gt_seg = self.get_input(input_dict, aug=False) #Get input and label
             pred_seg = self.net(input_tensor) #predict the segmentation label
 
-            # self.save_img(fx_img, os.path.join(visualization_path, f'{idx+1}-fx_img.nii'))
-            # self.save_img(mv_img, os.path.join(visualization_path, f'{idx+1}-mv_img.nii'))
+            self.save_img(input_tensor, os.path.join(visualization_path, f'{idx+1}-input_tensor.nii'))
+            self.save_img(gt_seg, os.path.join(visualization_path, f'{idx+1}-gt_seg.nii'))
             
             subject = input_dict['subject']
 
@@ -279,9 +279,9 @@ class cbctSeg(BaseArch):
                 
                 #self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice/inference/subject_{subject}/label_idx_{label_idx}", aft_dice, self.epoch) #Write Dice for Epoch to Tensorboard
 
-                # self.save_img(fx_seg[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-fx_img_{label_idx}.nii'))
-                # self.save_img(mv_seg[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-mv_img_{label_idx}.nii'))
-                # self.save_img(pred_seg[0], os.path.join(visualization_path, f'{idx+1}-pred_img_{label_idx}.nii'))
+                self.save_img(input_tensor[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-input_tensor_{label_idx}.nii'))
+                self.save_img(gt_seg[:, label_idx, ...], os.path.join(visualization_path, f'{idx+1}-gt_seg_{label_idx}.nii'))
+                self.save_img(pred_seg[0], os.path.join(visualization_path, f'{idx+1}-pred_img_{label_idx}.nii'))
 
             print('-' * 20)
 
@@ -292,7 +292,7 @@ class cbctSeg(BaseArch):
         #self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice_mean/inference", mean, self.epoch) #Write Dice for Epoch to Tensorboard
         #self.writer.add_scalar(f"{self.config.project}/{self.config.exp_name}/aft_dice_std/inference", std, self.epoch) #Write Dice for Epoch to Tensorboard
 
-        #Write resuults on test set to results.pkl file.
+        #Write results on test set to results.pkl file.
         with open(os.path.join(self.log_dir, 'results.pkl'), 'wb') as f:
             pkl.dump(results, f)
 
