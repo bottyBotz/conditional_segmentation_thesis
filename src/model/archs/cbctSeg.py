@@ -189,17 +189,24 @@ class cbctSeg(BaseArch):
         Info = f'step {self.step}'
         
         #Weighted Dice
-        if self.config.w_dce != 0:
-            L_dice = 0
-            for label_idx in range(pred_seg.shape[1]):
-                pred = pred_seg[:, label_idx:label_idx+1, ...]
-                gt = gt_seg[:, label_idx:label_idx+1, ...]
-                L_dice += loss.single_scale_dice(pred, gt) * self.config.dice_class_weights[label_idx]
-            L_dice *= self.config.w_dce
-            
+        if self.config.two_stage_sampling == 0:
+            if self.config.w_dce != 0:
+                L_dice = 0
+                for label_idx in range(pred_seg.shape[1]):
+                    pred = pred_seg[:, label_idx:label_idx+1, ...]
+                    gt = gt_seg[:, label_idx:label_idx+1, ...]
+                    L_dice += loss.single_scale_dice(pred, gt) * self.config.dice_class_weights[label_idx]
+                L_dice *= self.config.w_dce
+                
+                L_All += L_dice
+                Info += f', Loss_dice: {L_dice:.3f}'
+        #If two stage sampling is on we don't have to iterate through classes
+        else:
+            L_dice = loss.single_scale_dice(gt_seg, pred_seg) * self.config.w_dce
             L_All += L_dice
             Info += f', Loss_dice: {L_dice:.3f}'
-            
+
+        
         #Binary Cross Entropy
         if self.config.w_bce != 0:
             L_BCE = loss.wBCE(pred_seg, fx_seg, weights=self.config.class_weights)
