@@ -133,6 +133,9 @@ class cbctSeg(BaseArch):
                 return random.sample(tmp, 1)[0]
             else:
                 return fx_img, fx_seg
+        elif self.config.input_mode == 'ct_in_ct_out':
+            assert self.config.inc == 1, "input channel needs to be 1"
+            return mv_img, mv_seg
         else:
             raise NotImplementedError
         
