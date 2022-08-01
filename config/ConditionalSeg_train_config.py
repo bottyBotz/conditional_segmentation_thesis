@@ -24,5 +24,7 @@ parser.add_argument('--use_pseudo_label', default=0, type=int, help='using pseud
 parser.add_argument('--w_dce', default=1.0, type=float, help='the weight of dice loss')
 parser.add_argument('--w_bce', default=0, type=float, help='the weight of weighted binary cross-entropy')
 parser.add_argument('--class_weights', default=[0.5, 0.5], nargs='+', type=float, help='the weights for each class of the wbce')
+parser.add_argument('--input_mode', default=None, type=str, help='Input mode for the network. Use condiRev to use the reverse of the input during training only.')
+
 
 

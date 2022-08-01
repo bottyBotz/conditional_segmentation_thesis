@@ -63,18 +63,18 @@ class condiSeg(BaseArch):
         fx_img, mv_img = input_dict['fx_img'].cuda(), input_dict['mv_img'].cuda()  # [batch, 1, x, y, z]
         fx_seg, mv_seg = input_dict['fx_seg'].cuda(), input_dict['mv_seg'].cuda()  # label
         
-        print(f"fx_img shape: {fx_img.shape}")
-        print(f"mv_img shape: {mv_img.shape}")
-        print(f"fx_seg shape: {fx_seg.shape}")
-        print(f"mv_seg shape: {mv_seg.shape}")
+        # print(f"fx_img shape: {fx_img.shape}")
+        # print(f"mv_img shape: {mv_img.shape}")
+        # print(f"fx_seg shape: {fx_seg.shape}")
+        # print(f"mv_seg shape: {mv_seg.shape}")
 
         if self.config.two_stage_sampling == 0:
             fx_seg, mv_seg = fx_seg[:, 0, ...], mv_seg[:, 0, ...] #This removes the label dimension from the segmentation
 
-        print(f"fx_img shape: {fx_img.shape}")
-        print(f"mv_img shape: {mv_img.shape}")
-        print(f"fx_seg shape: {fx_seg.shape}")
-        print(f"mv_seg shape: {mv_seg.shape}")
+        # print(f"fx_img shape: {fx_img.shape}")
+        # print(f"mv_img shape: {mv_img.shape}")
+        # print(f"fx_seg shape: {fx_seg.shape}")
+        # print(f"mv_seg shape: {mv_seg.shape}")
 
         #If affine scale set in config, perform affine scaling
         if (self.config.affine_scale != 0.0) and aug:
@@ -95,13 +95,20 @@ class condiSeg(BaseArch):
         else:
             pass
 
-        print("done with aug...")
-        print(f"fx_img shape: {fx_img.shape}")
-        print(f"mv_img shape: {mv_img.shape}")
-        print(f"fx_seg shape: {fx_seg.shape}")
-        print(f"mv_seg shape: {mv_seg.shape}")
+        # print("done with aug...")
+        # print(f"fx_img shape: {fx_img.shape}")
+        # print(f"mv_img shape: {mv_img.shape}")
+        # print(f"fx_seg shape: {fx_seg.shape}")
+        # print(f"mv_seg shape: {mv_seg.shape}")
         # if self.config.two_stage_sampling == 1:
         #     ret
+        if self.config.input_mode == 'condiRev':
+            #If training, input is reversed condi-seg
+            if self.phase == 'train':
+                return mv_img, mv_seg, fx_img, fx_seg
+            #At test time, input is normal condiseg
+            else:
+                return fx_img, fx_seg, mv_img, mv_seg
         return fx_img, fx_seg, mv_img, mv_seg
 
     def gen_pseudo_data(self):
@@ -153,11 +160,11 @@ class condiSeg(BaseArch):
                     fx_img, fx_seg, mv_img, mv_seg = self.get_input(input_dict) 
 
                     optimizer.zero_grad() # clear gradients
-                    print(f"fx_img shape: {fx_img.shape}")
-                    print(f"mv_img shape: {mv_img.shape}")
-                    print(f"fx_seg shape: {fx_seg.shape}")
-                    print(f"mv_seg shape: {mv_seg.shape}")
-                    print(f"torch.cat([fx_img, mv_img, mv_seg], dim=1).shape: {torch.cat([fx_img, mv_img, mv_seg], dim=1).shape}")
+                    # print(f"fx_img shape: {fx_img.shape}")
+                    # print(f"mv_img shape: {mv_img.shape}")
+                    # print(f"fx_seg shape: {fx_seg.shape}")
+                    # print(f"mv_seg shape: {mv_seg.shape}")
+                    # print(f"torch.cat([fx_img, mv_img, mv_seg], dim=1).shape: {torch.cat([fx_img, mv_img, mv_seg], dim=1).shape}")
 
                     pred_seg = self.net(torch.cat([fx_img, mv_img, mv_seg], dim=1)) # forward pass
 
