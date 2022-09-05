@@ -120,13 +120,16 @@ for pid in os.listdir(os.path.join(src_root, 'fixed_images')):
 
         print(fx_img.shape, mv_img.shape)
         
+        
         tmp = []
+        # Loop through each label type (bladder or rectum)
         for i in range(fx_seg.shape[-1]):
             resampled_fx = ndimage.zoom(fx_seg[..., i], fx_pixdim/np.array([2.0, 2.0, 2.0]), order=0)
             tmp.append(resampled_fx)
         fx_seg = np.stack(tmp, axis=-1)
 
         tmp = []
+        #Loop through each label type (bladder or rectum)
         for i in range(mv_seg.shape[-1]):
             resampled_mv = ndimage.zoom(mv_seg[..., i], mv_pixdim/np.array([2.0, 2.0, 2.0]), order=0)
             resampled_mv = center_crop2(resampled_mv, 5, 15, 30)
@@ -142,7 +145,8 @@ for pid in os.listdir(os.path.join(src_root, 'fixed_images')):
             tmp.append(resampled_fx)
         fx_seg = np.stack(tmp)
 
-        mv_seg = np.transpose(mv_seg, (3, 0, 1, 2))
+    
+        mv_seg = np.transpose(mv_seg, (3, 0, 1, 2)) # 
 
 
         # handle some of the image shapes:
