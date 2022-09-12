@@ -72,11 +72,11 @@ exp_dir_list = {
     "04": './Experiments/**/CBCTUnetSeg/segModeBoth*/',
     "01": './Experiments/**/CBCTUnetSeg/segModeCBCT*/',
     "02":'./Experiments/**/CBCTUnetSeg/segModeCT*/',
-    "06": './Experiments/**/ConditionalSeg/CondisegCBCT*/',
-    "07":  './Experiments/**/ConditionalSegReversed/CondisegReversed*/',
+    "05": './Experiments/**/ConditionalSeg/CondisegCBCT*/',
+    "06":  './Experiments/**/ConditionalSegReversed/CondisegReversed*/',
     "03":'./Experiments/**/CBCTUnetSeg/inoutsegModeCT*/',
-    "08":'./Experiments/**/ConditionalSeg/CBCT_Infer_CondisegReversed*/',
-    "05": './Experiments/**/CBCTUnetSeg/segModeBoth_2sample*/'
+    "07":'./Experiments/**/ConditionalSeg/CBCT_Infer_CondisegReversed*/',
+    #"05": './Experiments/**/CBCTUnetSeg/segModeBoth_2sample*/'
     #'./logs/CBCTUnetSeg/hpc.09-*', #REFERENCE EXAMPLE
 }
 #Experiments/exp_1_All_Good_Except_conditional_seg/CBCTUnetSeg/segModeBothCV1/results.pkl
@@ -127,7 +127,7 @@ sns.set_theme(style="whitegrid")
 plot_data = pd.DataFrame(entire_results)
 plot_data.replace({'bladder':"Bladder", "rectum":"Rectum"}, inplace=True)
 print(plot_data)
-ax = sns.boxplot(x="method", y="dice", hue="organ", data=plot_data, palette="Set3", fliersize=4, order=['01', '02', '03', '04', '06', '07', '08'])
+ax = sns.boxplot(x="method", y="dice", hue="organ", data=plot_data, palette="Set3", fliersize=4, order=['01', '02', '03', '04', '05', '06', '07'])
 ax.set_title("DICE Coefficient by Organ by Experiment")
 ax.set_xlabel("Experiment ID")
 ax.set_ylabel("Dice Coefficient")
