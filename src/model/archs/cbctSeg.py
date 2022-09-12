@@ -250,6 +250,7 @@ class cbctSeg(BaseArch):
        
 
         #Save the best model as it's performance on the validation set
+        
         if mean > self.best_metric:
             self.best_metric = mean
             print('better model found.')
